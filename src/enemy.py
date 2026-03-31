@@ -3,7 +3,7 @@ from pygame.math import Vector2
 import math
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, waypoints, image):
+    def __init__(self, waypoints: list, image):
         # Sprite Init
         pg.sprite.Sprite.__init__(self)
         
