@@ -6,3 +6,5 @@
     a. A function that will check the "elements" applied to an enemy
     b. A function that will check what enemy a tower should be attacking
     c. A function that will set attributes to a given enemy
+# Documentation
+This program is a rudimentary tower defense game with elemental towers. The towers can each be 'applied' with an element which they will then attack with, triggering various 'elemental reactions'. The program does not need any external input or files, simply download everything and run the 'main.py' file. 
