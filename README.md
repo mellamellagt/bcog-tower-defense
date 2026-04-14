@@ -1,10 +1,31 @@
-# A brief (3-5 sentences) description of your planned project
-    My planned final project will be a tower defense game. The "towers" will be "elemental towers" which 
-    will be able to cause "reactions" on the enemies. The enemies will have different iterations 
-    (faster enemy, more health enemy, etc.). 
-# For each of three functions, a very brief (1-2 sentences) description of what the function will do. 
-    a. A function that will check the "elements" applied to an enemy
-    b. A function that will check what enemy a tower should be attacking
-    c. A function that will set attributes to a given enemy
-# Documentation
-This program is a rudimentary tower defense game with elemental towers. The towers can each be 'applied' with an element which they will then attack with, triggering various 'elemental reactions'. The program does not need any external input or files, simply download everything and run the 'main.py' file. 
+# Tower Defense Game
+This repository contains an interactive tower defense game built with pygame. 
+
+# Installation
+    # Install uv
+    pip add uv
+
+    # Install pygame to uv
+    uv add pygame-ce
+
+    # Run the Tower Defense
+    uv run main.py
+
+# Testing
+TBD
+
+# Code Structure
+- main.py - Run Tower Defense game
+- src/ - Core implementation
+    - enemy.py - Defines 'Enemy' class and corresponding logic
+    - turret.py - Defines 'Turret' class and corresponding logic
+    - world.py - Defines 'World' class and corresponding logic
+- assets/ - contains assets for the game
+    - images/ - contains images
+    - maps/ - contains map data
+- config/ - constants for running the program
+    - constants.py - contains game constants (FPS, screen size, etc;)
+
+# Controls
+Everything in the program is controlled by the mouse, click on buttons to activate their corresponding functions. 
+Click on the 'X' button on the pygame window to close the Tower Defense game. 
