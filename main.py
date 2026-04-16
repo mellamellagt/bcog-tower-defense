@@ -2,6 +2,7 @@ import pygame as pg
 from src.enemy import Enemy
 from src.turret import Turret
 from src.world import World
+from config import constants as c
 import json
 
 def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
@@ -23,25 +24,21 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     # Load Level JSON Data
     with open('assets/maps/map_one.tmj') as file: 
         world_data = json.load(file)
-    
-    waypoints = [
-        (100, 200),
-        (300, 100),
-        (500, 200),
-        (0, 0),
-        (600, 600)
-    ]
+
+    # Load Map
     world = World(world_data, map_image)
-    world.process_data()
+    # Get Waypoints from Map
+    world.get_waypoints()
+    # Temporary Class Testing
     enemy_group = pg.sprite.Group()
     turret_group = pg.sprite.Group()
-    enemy = Enemy(waypoints, enemy_image)
+    enemy = Enemy(world.waypoints, enemy_image)
     enemy_group.add(enemy)
 
     run = True
     while run: 
         # Set FPS
-        clock.tick(FPS)
+        clock.tick(c.FPS)
 
         # Update Group(s)
         enemy_group.update()
@@ -69,7 +66,7 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     pg.quit()
 
 def main():
-    run_game(600, 600, 60)
+    run_game(c.TILE_SIZE * c.MAP_WIDTH, c.TILE_SIZE * c.MAP_HEIGHT, 60)
 
 if __name__ == "__main__":
     main()
