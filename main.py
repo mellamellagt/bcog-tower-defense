@@ -42,6 +42,7 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
 
         # Update Group(s)
         enemy_group.update()
+        turret_group.update()
 
         # Draw Stuff
         screen.fill("grey100")
@@ -57,7 +58,7 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
             # Temporary Testing for placing 'turrets'
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 mouse_pos = pg.mouse.get_pos()
-                turret = Turret(turret_image, mouse_pos)
+                turret = Turret(turret_image, mouse_pos, enemy_group)
                 turret_group.add(turret)
         
         # Update Screen

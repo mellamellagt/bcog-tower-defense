@@ -29,3 +29,6 @@ TBD
 # Controls
 Everything in the program is controlled by the mouse, click on buttons to activate their corresponding functions. 
 Click on the 'X' button on the pygame window to close the Tower Defense game. 
+
+# Attribution
+Map Assets: Kenney (www.kenney.nl/assets/tower-defense-top-down)

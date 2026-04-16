@@ -28,7 +28,7 @@ class Enemy(pg.sprite.Sprite):
         self.rotate()
     
     def move(self):
-        # Check if there is more 'track' to go
+        # Check if Enemy is at the end and if so remove it
         if self.target_waypoint < len(self.waypoints):
             self.target = Vector2(self.waypoints[self.target_waypoint])
             self.movement = self.target - self.pos
@@ -38,10 +38,11 @@ class Enemy(pg.sprite.Sprite):
         if self.movement_remaining != 0 and self.movement[0] >= self.movement_remaining[0] and self.movement[1] >= self.movement_remaining[1]:
             self.pos += self.movement_remaining
             self.movement_remaining = 0
-        # Perform Movement
+        # Perform Normal Movement
         dist = self.movement.length()
         if dist >= self.speed: 
             self.pos += self.movement.normalize() * self.speed
+        # Make sure that we don't overshoot the waypoint, bank 'extra' movement, and update target waypoint
         else:
             if dist != 0: 
                 self.pos += self.movement.normalize()

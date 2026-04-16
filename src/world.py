@@ -2,6 +2,7 @@ import pygame as pg
 
 class World: 
     def __init__(self, data, image):
+        # Regarding Map
         self.level_data = data
         self.image = image
         self.waypoints = []
