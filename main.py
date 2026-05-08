@@ -16,24 +16,40 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     screen = pg.display.set_mode((screen_width, screen_height))
     pg.display.set_caption("BCOG 200 Tower Defense")
 
+    # Load Level JSON Data
+    with open('assets/maps/map_one.tmj') as file: 
+        world_data = json.load(file)
+
     # Define Class Images (TEMPORARY)
     enemy_image = pg.image.load(r'assets\images\enemy_temp.png').convert_alpha()
     turret_image = pg.image.load(r'assets\images\turret_temp.png').convert_alpha()
     map_image = pg.image.load(r'assets\images\map_one.png').convert_alpha()
 
-    # Load Level JSON Data
-    with open('assets/maps/map_one.tmj') as file: 
-        world_data = json.load(file)
-
     # Load Map
     world = World(world_data, map_image)
-    # Get Waypoints from Map
-    world.get_waypoints()
+    # Get Waypoints and Tilemap from Map
+    world.process_data()
     # Temporary Class Testing
     enemy_group = pg.sprite.Group()
     turret_group = pg.sprite.Group()
     enemy = Enemy(world.waypoints, enemy_image)
     enemy_group.add(enemy)
+
+    def create_turret(mouse_pos): 
+        # Assume Space is Free
+        space_free = True
+        # Calculate Mouse Position
+        mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
+        mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
+        # Calculate Tile Number
+        tile_num = (mouse_tile_y * c.MAP_HEIGHT) + mouse_tile_x
+        # Need to remake the map so that the tile numbers are consistent I guess?
+        for turret in turret_group
+            if (mouse_tile_x, mouse_tile_y) == (turret.tile_x, turret.tile_y):
+                space_free = False
+        if space_free == True:
+            new_turret = Turret(turret_image, mouse_tile_x, mouse_tile_y, c.TILE_SIZE)
+            turret_group.add(new_turret)
 
     run = True
     while run: 
@@ -58,8 +74,7 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
             # Temporary Testing for placing 'turrets'
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                 mouse_pos = pg.mouse.get_pos()
-                turret = Turret(turret_image, mouse_pos, enemy_group)
-                turret_group.add(turret)
+                create_turret(mouse_pos)
         
         # Update Screen
         pg.display.flip()

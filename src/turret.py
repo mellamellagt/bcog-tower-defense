@@ -3,13 +3,19 @@ from pygame.math import Vector2
 import math
 
 class Turret(pg.sprite.Sprite):
-    def __init__(self, image, pos, enemy_group, element = None):
+    def __init__(self, image, tile_x, tile_y, tile_size, element = None):
         # Sprite Init
         pg.sprite.Sprite.__init__(self)
 
-        #Regarding Image
+        # Regarding Placement
+        self.tile_x = tile_x
+        self.tile_y = tile_y
+        self.x = (self.tile_x + 0.5) * tile_size
+        self.y = (self.tile_y + 0.5) * tile_size
+        self.pos = Vector2((self.x, self.y))
+
+        # Regarding Image
         self.original_image = image
-        self.pos = Vector2(pos)
         self.angle = 0
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()
@@ -19,10 +25,11 @@ class Turret(pg.sprite.Sprite):
         self.range = 1000
         self.target = None
         self.element = element
-        self.enemy_group = enemy_group
+        # self.enemy_group = enemy_group
     
     def update(self):
-        self.find_target(self.enemy_group)
+        pass
+        # self.find_target(self.enemy_group)
 
     def find_target(self, enemy_group):
         # Clear Target from Prior Update
