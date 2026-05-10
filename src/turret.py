@@ -25,8 +25,18 @@ class Turret(pg.sprite.Sprite):
         self.range = 1000
         self.target = None
         self.element = element
+        self.selected = False
         # self.enemy_group = enemy_group
-    
+
+        # Regarding Range Circle
+        self.range_image = pg.Surface((self.range * 2, self.range * 2))
+        self.range_image.fill((0, 0, 0))
+        self.range_image.set_colorkey((0, 0, 0))
+        pg.draw.circle(self.range_image, 'grey100', (self.range, self.range), self.range)
+        self.range_image.set_alpha(100)
+        self.range_rect = self.range_image.get_rect()
+        self.range_rect.center = self.range_rect.center
+
     def update(self):
         pass
         # self.find_target(self.enemy_group)
@@ -43,3 +53,8 @@ class Turret(pg.sprite.Sprite):
         if min(distances) <= self.range:
             self.target = enemy_list[distances.index(min(distances))]
         print(self.target)
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+        if self.selected:
+            surface.blit(self.range_image, self.range_rect)
