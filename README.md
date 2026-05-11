@@ -1,3 +1,11 @@
+# Known Issues / 'Features'
+- Can place turrets on the path (need to redo map-making since the indeces are messed up somehow)
+
+# Future Implementations
+- Placeholder Images (Need to do art)
+- No animations (May or may not be added)
+- Elements + Upgrades for Towers
+
 # Tower Defense Game
 This repository contains an interactive tower defense game built with pygame. 
 

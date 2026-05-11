@@ -24,6 +24,9 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     # temporary button testing
     placing_turrets = False
 
+    # temporary range indicator testing
+    selected_turret = None
+
     # Define Class Images (TEMPORARY)
     enemy_image = pg.image.load(r'assets\images\enemy_temp.png').convert_alpha()
     turret_image = pg.image.load(r'assets\images\turret_temp.png').convert_alpha()
@@ -61,8 +64,6 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
             turret_group.add(new_turret)
 
     def select_turret(mouse_pos):
-        # Assume Space is Free
-        space_free = True
         # Calculate Mouse Position
         mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
         mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
@@ -83,7 +84,11 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
 
         # Update Group(s)
         enemy_group.update()
-        turret_group.update()
+        turret_group.update(enemy_group)
+
+        # Selected Turret
+        if selected_turret:
+            selected_turret.selected = True
 
         # Draw Stuff
         screen.fill("grey100")
@@ -117,6 +122,8 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
                     clear_selection()
                     if placing_turrets == True:
                         create_turret(mouse_pos)
+                    else:
+                        selected_turret = select_turret(mouse_pos)
             
         # Update Screen
         pg.display.flip()
