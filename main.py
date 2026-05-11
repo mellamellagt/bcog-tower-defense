@@ -97,13 +97,13 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
             game_over = True
             game_outcome = -1
             
-        # Update Group(s)
-        enemy_group.update(world)
-        turret_group.update(enemy_group, world)
+            # Update Group(s)
+            enemy_group.update(world)
+            turret_group.update(enemy_group, world)
 
-        # Selected Turret
-        if selected_turret:
-            selected_turret.selected = True
+            # Selected Turret
+            if selected_turret:
+                selected_turret.selected = True
 
         # Draw Stuff
         screen.fill("grey100")
