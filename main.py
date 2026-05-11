@@ -36,7 +36,7 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     cancel_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
 
     # Load Map
-    world = World(world_data, map_image)
+    world = World(world_data, map_image, c.LIVES, c.MONEY)
     # Get Waypoints and Tilemap from Map
     world.process_data()
     # Temporary Class Testing
@@ -44,8 +44,15 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     turret_group = pg.sprite.Group()
     enemy = Enemy(world.waypoints, enemy_image)
     enemy_group.add(enemy)
-    buy_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 30, 120, buy_button_image)
-    cancel_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 30, 150, cancel_button_image)
+    buy_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 75, 100, buy_button_image)
+    cancel_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 75, 200, cancel_button_image)
+
+    # Displaying Text
+    text_font = pg.font.SysFont('Consolas', 24, bold = True)
+
+    def create_text(text, font, color, x, y):
+        image = font.render(text, True, color)
+        screen.blit(image, (x, y))
 
     def create_turret(mouse_pos): 
         # Assume Space is Free
@@ -83,8 +90,8 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
         clock.tick(c.FPS)
 
         # Update Group(s)
-        enemy_group.update()
-        turret_group.update(enemy_group)
+        enemy_group.update(world)
+        turret_group.update(enemy_group, world)
 
         # Selected Turret
         if selected_turret:
@@ -106,8 +113,9 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
                 screen.blit(cursor_turret, cursor_rect)
             if cancel_button.draw(screen):
                 placing_turrets = False
-        # if selected_turret:
-            # selected_turret.selected = True
+        
+        create_text('LIVES: ' + str(world.lives), text_font, 'grey100', 0, 0)
+        create_text('MONEY: ' + str(world.money), text_font, 'grey100', 0, 30)
 
         # Event handler
         for event in pg.event.get():
@@ -120,8 +128,9 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
                 if mouse_pos[0] <= c.TILE_SIZE * c.MAP_WIDTH and mouse_pos[1] <= c.TILE_SIZE * c.MAP_HEIGHT:
                     selected_turret = None
                     clear_selection()
-                    if placing_turrets == True:
+                    if placing_turrets == True and world.money >= c.TURRET_COST:
                         create_turret(mouse_pos)
+                        world.money -= c.TURRET_COST
                     else:
                         selected_turret = select_turret(mouse_pos)
             

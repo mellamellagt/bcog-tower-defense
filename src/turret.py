@@ -28,6 +28,7 @@ class Turret(pg.sprite.Sprite):
         self.selected = False
         self.fire_delay = 1000
         self.last_shot = pg.time.get_ticks()
+        self.damage = 5
 
         # Regarding Range Circle
         self.range_image = pg.Surface((self.range * 2, self.range * 2))
@@ -38,11 +39,11 @@ class Turret(pg.sprite.Sprite):
         self.range_rect = self.range_image.get_rect()
         self.range_rect.center = self.rect.center
 
-    def update(self, enemy_group):
+    def update(self, enemy_group, world):
         self.find_target(enemy_group)
         if self.target and pg.time.get_ticks() - self.last_shot > self.fire_delay:
             self.last_shot = pg.time.get_ticks()
-            self.shoot()
+            self.shoot(world)
 
     def find_target(self, enemy_group):
         # Clear Target from Prior Update
@@ -55,6 +56,8 @@ class Turret(pg.sprite.Sprite):
         # Target Close
         # Convert Enemy Group to List
         enemy_list = enemy_group.sprites()
+        if bool(enemy_list) == False:
+            return None
         if min(enemy_distances) <= self.range:
             index = enemy_distances.index(min(enemy_distances))
             self.target = enemy_list[index]
@@ -69,6 +72,8 @@ class Turret(pg.sprite.Sprite):
         if self.selected:
             surface.blit(self.range_image, self.range_rect)
 
-    def shoot(self):
+    def shoot(self, world):
+        self.target.health -= self.damage
+        self.target.check_health(world)
         print('Shot')
         self.target = None

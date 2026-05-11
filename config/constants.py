@@ -6,3 +6,5 @@ MAP_WIDTH = 13
 # Game Constants
 FPS = 60
 LIVES = 100
+MONEY = 600
+TURRET_COST = 100

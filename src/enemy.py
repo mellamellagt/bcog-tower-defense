@@ -3,7 +3,7 @@ from pygame.math import Vector2
 import math
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, waypoints: list, image):
+    def __init__(self, waypoints, image):
         # Sprite Init
         pg.sprite.Sprite.__init__(self)
         
@@ -12,9 +12,12 @@ class Enemy(pg.sprite.Sprite):
         self.pos = Vector2(self.waypoints[0])
         self.target_waypoint = 1
 
-        # Regarding Movement Speed
+        # Regarding Enemy Information
         self.speed = 1
         self.movement_remaining = 0
+        self.health = 15
+        self.reward = 10
+        self.damage = 1
 
         # Regarding Image
         self.original_image = image
@@ -23,16 +26,17 @@ class Enemy(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
 
-    def update(self):
-        self.move()
+    def update(self, world):
+        self.move(world)
         self.rotate()
     
-    def move(self):
+    def move(self, world):
         # Check if Enemy is at the end and if so remove it
         if self.target_waypoint < len(self.waypoints):
             self.target = Vector2(self.waypoints[self.target_waypoint])
             self.movement = self.target - self.pos
         else:
+            world.lives -= 1
             self.kill()
         # Perform 'overflow' movement
         if self.movement_remaining != 0 and self.movement[0] >= self.movement_remaining[0] and self.movement[1] >= self.movement_remaining[1]:
@@ -56,3 +60,8 @@ class Enemy(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
+
+    def check_health(self, world):
+        if self.health <= 0:
+            self.kill()
+            world.money += self.reward

@@ -1,10 +1,12 @@
 import pygame as pg
 
 class World: 
-    def __init__(self, data, image):
+    def __init__(self, data, image, lives, money):
         # Regarding Map
         self.level_data = data
         self.image = image
+        self.lives = lives
+        self.money = money
         self.waypoints = []
         self.tilemap = []
 
