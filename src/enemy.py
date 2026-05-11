@@ -37,6 +37,7 @@ class Enemy(pg.sprite.Sprite):
             self.movement = self.target - self.pos
         else:
             world.lives -= 1
+            world.enemies_completed += 1
             self.kill()
         # Perform 'overflow' movement
         if self.movement_remaining != 0 and self.movement[0] >= self.movement_remaining[0] and self.movement[1] >= self.movement_remaining[1]:
@@ -64,4 +65,5 @@ class Enemy(pg.sprite.Sprite):
     def check_health(self, world):
         if self.health <= 0:
             self.kill()
+            world.enemies_completed += 1
             world.money += self.reward

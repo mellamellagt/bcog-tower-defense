@@ -21,6 +21,10 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     with open('assets/maps/map_one.tmj') as file: 
         world_data = json.load(file)
 
+    # temporary game mechanics testing
+    game_over = False
+    game_outcome = 0
+
     # temporary button testing
     placing_turrets = False
 
@@ -89,6 +93,10 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
         # Set FPS
         clock.tick(c.FPS)
 
+        if game_over == False and world.lives <= 0:
+            game_over = True
+            game_outcome = -1
+            
         # Update Group(s)
         enemy_group.update(world)
         turret_group.update(enemy_group, world)

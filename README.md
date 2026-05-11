@@ -5,6 +5,9 @@
 - Placeholder Images (Need to do art)
 - No animations (May or may not be added)
 - Elements + Upgrades for Towers
+- Add Implementation of Waves
+- Game Balancing I guess
+- Game Over + Restart
 
 # Tower Defense Game
 This repository contains an interactive tower defense game built with pygame. 

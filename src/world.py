@@ -5,10 +5,14 @@ class World:
         # Regarding Map
         self.level_data = data
         self.image = image
-        self.lives = lives
-        self.money = money
         self.waypoints = []
         self.tilemap = []
+
+        # Regarding Game Mechanics
+        self.lives = lives
+        self.money = money
+        self.enemies_spawned = 0 
+        self.enemies_completed = 0
 
     def draw(self, surface):
         # Draw Map onto 'Surface'
