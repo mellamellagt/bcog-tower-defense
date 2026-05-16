@@ -5,20 +5,23 @@ class Button():
     self.image = image
     self.rect = self.image.get_rect()
     self.rect.topleft = (x, y)
-    self.clicked = False
+    self.clickable = True
 
   def draw(self, surface):
-    action = False
+    # Assume the button was not clicked
+    clicked = False
+    # Get the mouse position
     pos = pg.mouse.get_pos()
-
+    # Check if mouse is over the button
     if self.rect.collidepoint(pos):
-      if pg.mouse.get_pressed()[0] == 1 and self.clicked == False:
-        action = True
-        self.clicked = True
-
+      # Check if the button is clicked
+      if pg.mouse.get_pressed()[0] == 1 and self.clickable == True:
+        clicked = True
+        self.clickable = False
+    # Allow button to be clicked again if mouse is released
     if pg.mouse.get_pressed()[0] == 0:
-      self.clicked = False
-
+      self.clickable = True
+    # Draw the button
     surface.blit(self.image, self.rect)
-
-    return action
+    # Return whether the button was clicked
+    return clicked

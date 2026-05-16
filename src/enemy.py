@@ -3,7 +3,7 @@ from pygame.math import Vector2
 import math
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, waypoints, image):
+    def __init__(self, type, data, waypoints, images):
         # Sprite Init
         pg.sprite.Sprite.__init__(self)
         
@@ -13,14 +13,16 @@ class Enemy(pg.sprite.Sprite):
         self.target_waypoint = 1
 
         # Regarding Enemy Information
-        self.speed = 1
+        self.health = data.get(type)['health']
+        self.speed = data.get(type)['speed']
         self.movement_remaining = 0
-        self.health = 15
-        self.reward = 10
-        self.damage = 1
+        self.reward = data.get(type)['reward']
+        self.damage = data.get(type)['damage']
+        self.element = None
+        self.shocks_remaining = 0
 
         # Regarding Image
-        self.original_image = image
+        self.original_image = images
         self.angle = 0
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()
@@ -67,3 +69,23 @@ class Enemy(pg.sprite.Sprite):
             self.kill()
             world.enemies_completed += 1
             world.money += self.reward
+
+    def apply_element(self, element): 
+        self.element = element
+
+    def check_element(self):
+        return self.element
+    
+    def get_shocked(self, last_shock, world):
+        if pg.time.get_ticks - last_shock > 100:
+            self.health -= 1
+            self.check_health(world)
+
+    def explode(self, enemy_group):
+        self.health -= 10
+        for enemy in enemy_group:
+            enemy_x = enemy.pos[0] - self.pos[0]
+            enemy_y = enemy.pos[1] - self.pos[1]
+            enemy_distance = math.sqrt((enemy_x ** 2) + (enemy_y ** 2))
+            if enemy_distance <= 100:
+                enemy.health -= 10
