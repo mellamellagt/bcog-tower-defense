@@ -1,7 +1,7 @@
 # Map Constants
 TILE_SIZE = 40
-MAP_HEIGHT = 13
-MAP_WIDTH = 13
+MAP_HEIGHT = 14
+MAP_WIDTH = 14
 SIDE_PANEL = 300
 
 # Game Constants
@@ -21,7 +21,7 @@ TURRETS = {
         'damage': 2
     },
     'aoe':{
-        'range': 200,
+        'range': 100,
         'fire_delay': 250,
         'damage': 1
     },

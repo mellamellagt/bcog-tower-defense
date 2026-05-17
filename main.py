@@ -35,18 +35,23 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     with open('assets/maps/map_one.tmj') as file: 
         world_data = json.load(file)
 
-    # Define Images (TEMP)
+    # Define Images
     map_image = pg.image.load(r'assets\images\map_one.png').convert_alpha()
     enemy_image = pg.image.load(r'assets\images\enemy_temp.png').convert_alpha()
     turret_image = pg.image.load(r'assets\images\turret_temp.png').convert_alpha()
     cursor_turret = pg.image.load(r'assets\images\turret_temp.png').convert_alpha()
     buy_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
-    cancel_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
-    begin_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
-    restart_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
-    upgrade_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
-    element_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
-    targeting_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
+    cancel_button_image = pg.image.load(r'assets\images\cancel_button.png').convert_alpha()
+    begin_button_image = pg.image.load(r'assets\images\begin_button.png').convert_alpha()
+    restart_button_image = pg.image.load(r'assets\images\restart_button.png').convert_alpha()
+    upgrade_button_image = pg.image.load(r'assets\images\upgrade_button.png').convert_alpha()
+    fire_button_image = pg.image.load(r'assets\images\fire_button.png').convert_alpha()
+    water_button_image = pg.image.load(r'assets\images\water_button.png').convert_alpha()
+    lightning_button_image = pg.image.load(r'assets\images\lightning_button.png').convert_alpha()
+    targeting_button_image = pg.image.load(r'assets\images\target_button.png').convert_alpha()
+    aoe_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
+    sniper_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
+    no_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
 
     # Create the Map
     world = create_world(world_data, map_image, c.LIVES, c.MONEY, c.WAVES)
@@ -66,12 +71,19 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     selected_turret = None
     last_enemy_spawned = pg.time.get_ticks()
 
-    # Create Buttons (TEMP)
-    buy_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 75, 100, buy_button_image)
-    cancel_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 75, 200, cancel_button_image)
-    begin_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 75, 400, begin_button_image)
-    upgrade_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 75, 300, upgrade_button_image)
-    restart_button = Button(310, 300, restart_button_image)
+    # Create Buttons
+    buy_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 435, buy_button_image)
+    cancel_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 175, 435, cancel_button_image)
+    begin_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 500, begin_button_image)
+    upgrade_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 207.5, upgrade_button_image)
+    restart_button = Button(340, 300, restart_button_image)
+    aoe_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 270, aoe_button_image)
+    sniper_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 270, sniper_button_image)
+    no_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 270, no_button_image)
+    fire_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 105, 145, fire_button_image)
+    water_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 165, 145, water_button_image)
+    lightning_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 225, 145, lightning_button_image)
+    targeting_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 350, targeting_button_image)
 
     # Game Loop
     run = True
@@ -105,9 +117,11 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
         # Draw Turrets
         for turret in turret_group:
             turret.draw(screen)
-        # Draw Buy Button
-        if buy_button.draw(screen):
-            placing_turrets = True
+        # Draw Buy Button if not currently Placing Turrets
+        if not placing_turrets:
+            create_text('Cost:$' + str(c.UPGRADE_COST), text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 175, 455, screen)
+            if buy_button.draw(screen):
+                placing_turrets = True
         # Draw Turret on Cursor when Placing Turrets
         if placing_turrets: 
             cursor_rect = cursor_turret.get_rect()
@@ -118,15 +132,44 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
             # Draw Cancel Button only if Placing Turrets
             if cancel_button.draw(screen):
                 placing_turrets = False
+        # Show info and buttons related to turret if one is selected
         if selected_turret:
-            create_text('UPGRADE LEVEL: ' + str(selected_turret.upgrade_level) + '/5', text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 25, 0, screen)
-            create_text('ELEMENT: ' + str(selected_turret.element), text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 25, 30, screen)
-            create_text('TARGETING: ' + str(selected_turret.targeting), text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 25, 60, screen)
+            # Draw Turret Info Text
+            create_text('UPGRADE LEVEL: ' + str(selected_turret.upgrade_level) + '/5', text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 25, 5, screen)
+            create_text('ELEMENT: ' + str(selected_turret.element), text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 25, 35, screen)
+            create_text('TARGETING: ' + str(selected_turret.targeting), text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 25, 65, screen)
+            # Upgrade Turret
             if selected_turret.upgrade_level < 5:
+                create_text('Cost:$' + str(c.UPGRADE_COST), text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 150, 237.5, screen)
                 if upgrade_button.draw(screen):
-                    selected_turret.upgrade()
+                    if world.money >= c.UPGRADE_COST:
+                        selected_turret.upgrade()
+                        world.money -= c.UPGRADE_COST
+            # Change Turret Type
+            elif selected_turret.upgrade_level >= 5 and selected_turret.type_chosen == False:
+                create_text('Change Turret Type?', text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 25, 237.5, screen)
+                if aoe_button.draw(screen):
+                    selected_turret.change_type('aoe')
+                    selected_turret.type_chosen = True
+                elif sniper_button.draw(screen):
+                    selected_turret.change_type('sniper')
+                    selected_turret.type_chosen = True
+                elif no_button.draw(screen):
+                    selected_turret.type_chosen = True
+            # Change Turret Element
+            create_text('Change', text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 10, 145, screen)
+            create_text('Element', text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 5, 175, screen)
+            if fire_button.draw(screen):
+                selected_turret.apply_element('fire')
+            elif water_button.draw(screen):
+                selected_turret.apply_element('water')
+            elif lightning_button.draw(screen):
+                selected_turret.apply_element('lightning')
+            # Change Turret Targeting
+            if targeting_button.draw(screen):
+                selected_turret.change_targeting()
 
-        # Draw Text
+        # Draw Game Info Text
         create_text('LIVES: ' + str(world.lives), text_font, 'grey100', 5, 0, screen)
         create_text('MONEY: $' + str(world.money), text_font, 'grey100', 5, 30, screen)
         create_text('WAVE: ' + str(world.wave) + '/' + str(len(world.waves)), text_font, 'grey100', 5, 60, screen)
@@ -152,11 +195,11 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
                     last_enemy_spawned = pg.time.get_ticks()
         else: 
             # Game Over Logic
-            pg.draw.rect(screen, 'blue', (200, 200, 400, 200), border_radius = 30)
+            pg.draw.rect(screen, 'white', (200, 200, 400, 200), border_radius = 30)
             if game_outcome == -1:
-                create_text('GAME OVER', text_font, 'grey0', 310, 230, screen)
+                create_text('GAME OVER', text_font, 'grey0', 345, 230, screen)
             elif game_outcome == 1:
-                create_text('YOU WIN', text_font, 'grey0', 310, 230, screen)
+                create_text('YOU WIN', text_font, 'grey0', 345, 230, screen)
             if restart_button.draw(screen):
                 # Set Game Mechanics to Starting State
                 game_over = False
@@ -198,11 +241,11 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
                             if (mouse_tile_x, mouse_tile_y) == (turret.tile_x, turret.tile_y):
                                 space_free = False
                         # Check if the Tile is placeable (need to implement)
-                        if space_free == True and tile_num:
+                        if space_free == True and world.tilemap[tile_num] == 2:
                             new_turret = Turret(turret_image, mouse_tile_x, mouse_tile_y, c.TILE_SIZE, c.TURRETS)
                             turret_group.add(new_turret)
-                        # Subtract Money
-                        world.money -= c.TURRET_COST
+                            # Subtract Money
+                            world.money -= c.TURRET_COST
                     else:
                         # Calculate Mouse Position
                         mouse_tile_x = mouse_pos[0] // c.TILE_SIZE

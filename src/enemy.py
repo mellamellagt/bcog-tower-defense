@@ -20,6 +20,7 @@ class Enemy(pg.sprite.Sprite):
         self.damage = data.get(type)['damage']
         self.element = None
         self.shocks_remaining = 0
+        self.last_shock = pg.time.get_ticks()
 
         # Regarding Image
         self.original_image = images
@@ -30,6 +31,8 @@ class Enemy(pg.sprite.Sprite):
 
     def update(self, world):
         self.move(world)
+        if self.shocks_remaining > 0:
+            self.get_shocked(world)
         self.rotate()
     
     def move(self, world):
@@ -64,28 +67,38 @@ class Enemy(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
 
+    # Checks if the Enemy is Alive
     def check_health(self, world):
         if self.health <= 0:
             self.kill()
             world.enemies_completed += 1
             world.money += self.reward
 
+    # Applies an Element to the Enemy
     def apply_element(self, element): 
         self.element = element
 
+    # Returns Element
     def check_element(self):
-        return self.element
+        if self.element:
+            return self.element
+        return False
     
-    def get_shocked(self, last_shock, world):
-        if pg.time.get_ticks - last_shock > 100:
+    # DoT Effect from Shock (Lightning + Water)
+    def get_shocked(self, world):
+        if pg.time.get_ticks() - self.last_shock > 250:
+            self.last_shock = pg.time.get_ticks()
             self.health -= 1
             self.check_health(world)
+            print('Shock DoT Taken Succesfully')
 
+    # Damage Effect from Explosion (Fire + Lightning)
     def explode(self, enemy_group):
-        self.health -= 10
+        self.health -= 5
         for enemy in enemy_group:
             enemy_x = enemy.pos[0] - self.pos[0]
             enemy_y = enemy.pos[1] - self.pos[1]
             enemy_distance = math.sqrt((enemy_x ** 2) + (enemy_y ** 2))
             if enemy_distance <= 100:
-                enemy.health -= 10
+                enemy.health -= 5
+        print('Explosion Successful')

@@ -30,6 +30,7 @@ class World:
             if layer['name'] == 'waypoints':
                 self.waypoints = [(line['x'], line['y']) for object in layer['objects'] for line in object['polyline']]
     
+    # Randomize Pre-set Wave
     def load_wave(self):
         enemies = self.waves[self.wave - 1]
         for type in enemies: 
@@ -38,11 +39,13 @@ class World:
                 self.enemy_list.append(type)
         random.shuffle(self.enemy_list)
 
+    # Check if the Current Wave is Done
     def check_wave_completion(self): 
         if self.enemies_completed >= len(self.enemy_list):
             return True
         return False
     
+    # Set up Next Wave
     def next_wave(self): 
         self.wave += 1
         self.enemy_list = []

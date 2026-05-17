@@ -34,11 +34,14 @@ class Turret(pg.sprite.Sprite):
         self.selected = False
         self.fire_delay = self.data.get('basic')['fire_delay']
         self.last_shot = pg.time.get_ticks()
-        self.damage = self.data.get('basic')['fire_delay']
+        self.damage = self.data.get('basic')['damage']
+        self.type_chosen = False
+        
+        # Creating Range Circle
         self.create_range_image()
 
     def create_range_image(self):
-        # Regarding Range Circle
+        # Creating Range Circle
         self.range_image = pg.Surface((self.range * 2, self.range * 2))
         self.range_image.fill((0, 0, 0))
         self.range_image.set_colorkey((0, 0, 0))
@@ -48,10 +51,15 @@ class Turret(pg.sprite.Sprite):
         self.range_rect.center = self.rect.center
 
     def update(self, enemy_group, world):
+        # Actions performed per frame
         self.find_target(enemy_group)
         if self.target and pg.time.get_ticks() - self.last_shot > self.fire_delay:
             self.last_shot = pg.time.get_ticks()
-            self.shoot(world, enemy_group)
+            if self.targeting == 'aoe':
+                for target in self.target:
+                    self.shoot(world, target, enemy_group)
+            else:
+                self.shoot(world, self.target, enemy_group)
 
     def find_target(self, enemy_group):
         # Clear Target from Prior Update
@@ -79,9 +87,21 @@ class Turret(pg.sprite.Sprite):
                 if distance <= self.range:
                     self.target = enemy_list[i]
                     if self.target and pg.time.get_ticks() - self.last_shot > self.fire_delay:
-                        self.angle = math.degrees(math.atan2(-enemy_y[index], enemy_x[index])) - 90
+                        self.angle = math.degrees(math.atan2(-enemy_y[i], enemy_x[i])) - 90
+                    break
+        # Targeting Last Enemy
+        if self.targeting == 'Last':
+            for i, distance in enumerate(enemy_distances):
+                if distance <= self.range:
+                    self.target = enemy_list[i]
+            if self.target and pg.time.get_ticks() - self.last_shot > self.fire_delay:
+                self.angle = math.degrees(math.atan2(-enemy_y[i], enemy_x[i])) - 90
+        # Targeting AOE
+        if self.targeting == 'aoe':
+            self.target = [enemy_list[i] for i, distance in enumerate(enemy_distances) if distance <= self.range]
 
     def draw(self, surface):
+        # Draw Method
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
@@ -89,65 +109,83 @@ class Turret(pg.sprite.Sprite):
         if self.selected:
             surface.blit(self.range_image, self.range_rect)
 
-    def shoot(self, world, enemy_group):
-        if self.target.check_element():
-            enemy_element = self.target.element()
-            self.perform_reaction(enemy_element, enemy_group)
+    def shoot(self, world, target, enemy_group):
+        # Check for Element and Perform Reactions on Target
+        if target.check_element():
+            enemy_element = target.check_element()
+            self.perform_reaction(target, enemy_element, enemy_group)
+        # Apply Element onto Target if one is not already applied
         else:
-            self.target.apply_element(self.element)
+            target.apply_element(self.element)
+        # Logic regarding Fire + Water Reaction impact on Damage
         if self.half_dmg:
-            self.target.health -= self.damage / 2
+            target.health -= self.damage / 2
             self.half_dmg = False
+            print('Water Reduced Your Fire Damage')
         elif self.double_dmg:
-            self.target.health -= self.damage * 2
+            target.health -= self.damage * 2
             self.double_dmg = False
+            print('Fire increased Your Water Damage')
         else: 
-            self.target.health -= self.damage
-        self.target.check_health(world)
+            target.health -= self.damage
+        # Check if the Target Dies
+        target.check_health(world)
+        # Clear Target
         self.target = None
 
-    def perform_reaction(self, enemy_element, enemy_group):
-        if enemy_element == 'Fire':
-            if self.element == 'Water':
+    def perform_reaction(self, target, enemy_element, enemy_group):
+        # Reaction Logic
+        if enemy_element == 'fire':
+            if self.element == 'water':
                 self.double_dmg = True
-                self.target.element = None
-            if self.element == 'Lightning':
-                self.target.explode(enemy_group)
-                self.target.element = None
-        elif enemy_element == 'Lightning':
-            if self.element == 'Water':
-                self.target.shocks_remaining += 5
-                self.target.element = None
-            if self.element == 'Fire':
-                self.target.explode(enemy_group)
-                self.target.element = None
-        elif enemy_element == 'Water':
-            if self.element == 'Fire':
+                target.element = None
+            if self.element == 'lightning':
+                target.explode(enemy_group)
+                target.element = None
+        elif enemy_element == 'lightning':
+            if self.element == 'water':
+                target.shocks_remaining += 5
+                target.element = None
+            if self.element == 'fire':
+                target.explode(enemy_group)
+                target.element = None
+        elif enemy_element == 'water':
+            if self.element == 'fire':
                 self.half_dmg = True
-                self.target.element = None
-            if self.element == 'Lightning':
-                self.target.shocks_remaining += 5
-                self.target.element = None
+                target.element = None
+            if self.element == 'lightning':
+                target.shocks_remaining += 5
+                target.element = None
 
+    # Upgrades the Turret
     def upgrade(self):
+        # Upgrade Turret
         self.upgrade_level += 1
         self.range = self.range * 1.1
-        self.damage += 1
+        self.damage += 0.2
         self.fire_delay = self.fire_delay * 0.9
         self.create_range_image()
 
+    # Changes Type of the Turret and Resets Upgrade Level
     def change_type(self, type):
         self.type = type
+        self.upgrade_level = 0
         self.range = self.data.get(type)['range']
         self.fire_delay = self.data.get(type)['fire_delay']
         self.damage = self.data.get(type)['damage']
         self.create_range_image()
+        if self.type == 'aoe':
+            self.targeting = 'aoe'
 
+    # Applies an Element to the Turret
     def apply_element(self, element):
         self.element = element
 
+    # Cycles through Targetting Methods
     def change_targeting(self):
         if self.targeting == 'First':
             self.targeting = 'Close'
         elif self.targeting == 'Close':
+            self.targeting = 'Last'
+        elif self.targeting == 'Last':
             self.targeting = 'First'
