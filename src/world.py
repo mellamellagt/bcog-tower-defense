@@ -1,6 +1,12 @@
 import pygame as pg
 import random
 
+'''
+Methods draw, process_data, check_wave_completion, and next_wave likely consist of code that can entirely be found in the walkthrough
+Methods __init__ and load_wave contain code from the Walkthrough but has definitely been modified / expanded upon
+Method generate_wave is entirely original code
+'''
+
 class World: 
     def __init__(self, data, image, lives, money, waves):
         # Regarding Map
@@ -17,6 +23,7 @@ class World:
         self.enemy_list = []
         self.enemies_spawned = 0 
         self.enemies_completed = 0
+        self.endless = False
 
     def draw(self, surface):
         # Draw Map onto 'Surface'
@@ -30,14 +37,23 @@ class World:
             if layer['name'] == 'waypoints':
                 self.waypoints = [(line['x'], line['y']) for object in layer['objects'] for line in object['polyline']]
     
-    # Randomize Pre-set Wave
+    # Randomize Wave
     def load_wave(self):
-        enemies = self.waves[self.wave - 1]
-        for type in enemies: 
-            spawn_queue = enemies[type]
-            for enemy in range(spawn_queue):
-                self.enemy_list.append(type)
-        random.shuffle(self.enemy_list)
+        if self.wave <= len(self.waves):
+            enemies = self.waves[self.wave - 1]
+            for type in enemies: 
+                spawn_queue = enemies[type]
+                for enemy in range(spawn_queue):
+                    self.enemy_list.append(type)
+            random.shuffle(self.enemy_list)
+        else: 
+            enemies = self.generate_wave()
+            for type in enemies: 
+                spawn_queue = enemies[type]
+                for enemy in range(spawn_queue):
+                    self.enemy_list.append(type)
+            random.shuffle(self.enemy_list)
+            
 
     # Check if the Current Wave is Done
     def check_wave_completion(self): 
@@ -51,3 +67,14 @@ class World:
         self.enemy_list = []
         self.enemies_completed = 0
         self.enemies_spawned = 0
+
+    def generate_wave(self):
+        weak = round(5 * self.wave * random.randint(7, 13) / 10)
+        medium = round(5 * self.wave / 4 * random.randint(7, 13) / 10)
+        strong = round(1 * self.wave / 5 * random.randint(7, 13) / 10)
+        wave = {
+            'weak': weak,
+            'medium': medium,
+            'strong': strong
+        }
+        return wave

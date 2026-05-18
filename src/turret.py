@@ -2,6 +2,12 @@ import pygame as pg
 from pygame.math import Vector2
 import math
 
+'''
+Methods create_range_circle and draw consist of code taken entirely from Walkthrough
+Methods __init__, update, find_target, and shoot contain code from Walkthrough that has been altered / expanded upon
+Methods perform_reaction, change_targeting, upgrade, change_type, and apply_element consist of entirely original code
+'''
+
 class Turret(pg.sprite.Sprite):
     def __init__(self, images, tile_x, tile_y, tile_size, data):
         # Sprite Init
@@ -13,13 +19,6 @@ class Turret(pg.sprite.Sprite):
         self.x = (self.tile_x + 0.5) * tile_size
         self.y = (self.tile_y + 0.5) * tile_size
         self.pos = Vector2((self.x, self.y))
-
-        # Regarding Image
-        self.original_image = images
-        self.angle = 0
-        self.image = pg.transform.rotate(self.original_image, self.angle)
-        self.rect = self.image.get_rect()
-        self.rect.center = self.pos
 
         # Regarding Game Mechanics
         self.data = data
@@ -36,7 +35,20 @@ class Turret(pg.sprite.Sprite):
         self.last_shot = pg.time.get_ticks()
         self.damage = self.data.get('basic')['damage']
         self.type_chosen = False
-        
+
+        # Create Turret Base
+        self.images = images
+        self.base = self.images.get('base')
+        self.base_rect = self.base.get_rect()
+        self.base_rect.center = self.pos
+
+        # Regarding Image
+        self.original_image = self.images.get(self.type)
+        self.angle = 0
+        self.image = pg.transform.rotate(self.original_image, self.angle)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+
         # Creating Range Circle
         self.create_range_image()
 
@@ -105,6 +117,11 @@ class Turret(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
+        if self.type == 'aoe':
+            self.rect.center = (self.rect.center[0], self.rect.center[1] - 15)
+        elif self.type == 'sniper':
+            self.rect.center = (self.rect.center[0], self.rect.center[1] - 12)
+        surface.blit(self.base, self.base_rect)
         surface.blit(self.image, self.rect)
         if self.selected:
             surface.blit(self.range_image, self.range_rect)
@@ -169,6 +186,7 @@ class Turret(pg.sprite.Sprite):
     # Changes Type of the Turret and Resets Upgrade Level
     def change_type(self, type):
         self.type = type
+        self.original_image = self.images.get(self.type)
         self.upgrade_level = 0
         self.range = self.data.get(type)['range']
         self.fire_delay = self.data.get(type)['fire_delay']

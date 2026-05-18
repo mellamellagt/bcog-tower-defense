@@ -1,3 +1,7 @@
+'''
+The existence of this file takes inspiration from the Walkthrough
+However, the choices made in this file are entirely original
+'''
 # Map Constants
 TILE_SIZE = 40
 MAP_HEIGHT = 14
@@ -7,7 +11,7 @@ SIDE_PANEL = 300
 # Game Constants
 FPS = 60
 LIVES = 100
-MONEY = 600
+MONEY = 1000
 TURRET_COST = 100
 UPGRADE_COST = 100
 SPAWN_DELAY = 400

@@ -6,6 +6,14 @@ from src.button import Button
 from config import constants as c
 import json
 
+'''
+Method create_text was entirely taken from Walkthrough (See Attributions in README)
+Method create_world consists of code taken from Walkthrough
+Method run_game consists of code originally taken from Walkthrough but altered / expanded upon by myself
+    It's somewhat difficult to break this method down into smaller sections for specific attribution,
+    although the walkthrough generally contributes the skeleton / foundational functionality
+'''
+
 def create_text(text, font, color, x, y, screen):
     image = font.render(text, True, color)
     screen.blit(image, (x, y))
@@ -37,9 +45,18 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
 
     # Define Images
     map_image = pg.image.load(r'assets\images\map_one.png').convert_alpha()
-    enemy_image = pg.image.load(r'assets\images\enemy_temp.png').convert_alpha()
-    turret_image = pg.image.load(r'assets\images\turret_temp.png').convert_alpha()
-    cursor_turret = pg.image.load(r'assets\images\turret_temp.png').convert_alpha()
+    enemy_images = {
+        'weak': pg.image.load(r'assets\images\weak_enemy.png').convert_alpha(),
+        'medium': pg.image.load(r'assets\images\medium_enemy.png').convert_alpha(),
+        'strong': pg.image.load(r'assets\images\strong_enemy.png').convert_alpha()
+    }
+    turret_images = {
+        'basic': pg.image.load(r'assets\images\basic_turret.png').convert_alpha(),
+        'aoe': pg.image.load(r'assets\images\aoe_turret.png').convert_alpha(),
+        'sniper': pg.image.load(r'assets\images\sniper_turret.png').convert_alpha(),
+        'base': pg.image.load(r'assets\images\turret_base.png').convert_alpha()
+    }
+    cursor_turret = pg.image.load(r'assets\images\basic_turret.png').convert_alpha()
     buy_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
     cancel_button_image = pg.image.load(r'assets\images\cancel_button.png').convert_alpha()
     begin_button_image = pg.image.load(r'assets\images\begin_button.png').convert_alpha()
@@ -49,9 +66,10 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     water_button_image = pg.image.load(r'assets\images\water_button.png').convert_alpha()
     lightning_button_image = pg.image.load(r'assets\images\lightning_button.png').convert_alpha()
     targeting_button_image = pg.image.load(r'assets\images\target_button.png').convert_alpha()
-    aoe_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
-    sniper_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
-    no_button_image = pg.image.load(r'assets\images\buy_button.png').convert_alpha()
+    aoe_button_image = pg.image.load(r'assets\images\aoe_button.png').convert_alpha()
+    sniper_button_image = pg.image.load(r'assets\images\sniper_button.png').convert_alpha()
+    no_button_image = pg.image.load(r'assets\images\no_button.png').convert_alpha()
+    endless_button_image = pg.image.load(r'assets\images\endless_button.png').convert_alpha()
 
     # Create the Map
     world = create_world(world_data, map_image, c.LIVES, c.MONEY, c.WAVES)
@@ -76,14 +94,19 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
     cancel_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 175, 435, cancel_button_image)
     begin_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 500, begin_button_image)
     upgrade_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 207.5, upgrade_button_image)
-    restart_button = Button(340, 300, restart_button_image)
+
     aoe_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 270, aoe_button_image)
-    sniper_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 270, sniper_button_image)
-    no_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 270, no_button_image)
+    sniper_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 85, 270, sniper_button_image)
+    no_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 205, 270, no_button_image)
+
     fire_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 105, 145, fire_button_image)
     water_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 165, 145, water_button_image)
     lightning_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 225, 145, lightning_button_image)
+
     targeting_button = Button(c.TILE_SIZE * c.MAP_WIDTH + 5, 350, targeting_button_image)
+
+    endless_button = Button(400, 300, endless_button_image)
+    restart_button = Button(250, 300, restart_button_image)
 
     # Game Loop
     run = True
@@ -96,7 +119,7 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
             if world.lives <= 0:
                 game_over = True
                 game_outcome = -1
-            if world.wave >= len(world.waves):
+            if world.wave > len(world.waves) and world.endless == False:
                 game_over = True
                 game_outcome = 1
             
@@ -122,13 +145,22 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
             create_text('Cost:$' + str(c.UPGRADE_COST), text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 175, 455, screen)
             if buy_button.draw(screen):
                 placing_turrets = True
-        # Draw Turret on Cursor when Placing Turrets
+        # Draw Turret and Range Circle on Cursor when Placing Turrets
         if placing_turrets: 
             cursor_rect = cursor_turret.get_rect()
             cursor_pos = pg.mouse.get_pos()
             cursor_rect.center = cursor_pos
+            range = c.TURRETS.get('basic')['range']
+            range_image = pg.Surface((range * 2, range * 2))
+            range_image.fill((0, 0, 0))
+            range_image.set_colorkey((0, 0, 0))
+            pg.draw.circle(range_image, 'grey100', (range, range), range)
+            range_image.set_alpha(100)
+            range_rect = range_image.get_rect()
+            range_rect.center = cursor_rect.center
             if cursor_pos[0] <= c.MAP_WIDTH * c.TILE_SIZE:
                 screen.blit(cursor_turret, cursor_rect)
+                screen.blit(range_image, range_rect)
             # Draw Cancel Button only if Placing Turrets
             if cancel_button.draw(screen):
                 placing_turrets = False
@@ -157,14 +189,15 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
                 elif no_button.draw(screen):
                     selected_turret.type_chosen = True
             # Change Turret Element
-            create_text('Change', text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 10, 145, screen)
-            create_text('Element', text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 5, 175, screen)
-            if fire_button.draw(screen):
-                selected_turret.apply_element('fire')
-            elif water_button.draw(screen):
-                selected_turret.apply_element('water')
-            elif lightning_button.draw(screen):
-                selected_turret.apply_element('lightning')
+            if selected_turret.element == None:
+                create_text('Apply', text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 10, 145, screen)
+                create_text('Element', text_font, 'grey100', c.TILE_SIZE * c.MAP_WIDTH + 5, 175, screen)
+                if fire_button.draw(screen):
+                    selected_turret.apply_element('fire')
+                elif water_button.draw(screen):
+                    selected_turret.apply_element('water')
+                elif lightning_button.draw(screen):
+                    selected_turret.apply_element('lightning')
             # Change Turret Targeting
             if targeting_button.draw(screen):
                 selected_turret.change_targeting()
@@ -189,7 +222,7 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
                 # Spawn Enemies
                 if pg.time.get_ticks() - last_enemy_spawned > c.SPAWN_DELAY and world.enemies_spawned < len(world.enemy_list): 
                     enemy_type = world.enemy_list[world.enemies_spawned]
-                    enemy = Enemy(enemy_type, c.ENEMIES, world.waypoints, enemy_image)
+                    enemy = Enemy(enemy_type, c.ENEMIES, world.waypoints, enemy_images)
                     enemy_group.add(enemy)
                     world.enemies_spawned += 1
                     last_enemy_spawned = pg.time.get_ticks()
@@ -198,8 +231,15 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
             pg.draw.rect(screen, 'white', (200, 200, 400, 200), border_radius = 30)
             if game_outcome == -1:
                 create_text('GAME OVER', text_font, 'grey0', 345, 230, screen)
+                if world.endless == True:
+                    create_text('You Cleared: ' + str(world.wave) + ' Waves!', text_font, 'grey0', 250, 260, screen)
             elif game_outcome == 1:
                 create_text('YOU WIN', text_font, 'grey0', 345, 230, screen)
+                # Endless Mode Option
+                if endless_button.draw(screen):
+                    world.endless = True
+                    game_over = False
+                    game_outcome = 0
             if restart_button.draw(screen):
                 # Set Game Mechanics to Starting State
                 game_over = False
@@ -242,7 +282,7 @@ def run_game(screen_width: int, screen_height: int, FPS: int) -> None:
                                 space_free = False
                         # Check if the Tile is placeable (need to implement)
                         if space_free == True and world.tilemap[tile_num] == 2:
-                            new_turret = Turret(turret_image, mouse_tile_x, mouse_tile_y, c.TILE_SIZE, c.TURRETS)
+                            new_turret = Turret(turret_images, mouse_tile_x, mouse_tile_y, c.TILE_SIZE, c.TURRETS)
                             turret_group.add(new_turret)
                             # Subtract Money
                             world.money -= c.TURRET_COST

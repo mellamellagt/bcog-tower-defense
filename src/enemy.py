@@ -2,6 +2,12 @@ import pygame as pg
 from pygame.math import Vector2
 import math
 
+'''
+Methods rotate and check_health may not contain any modified code, although I'm not certain
+Methods __init__, update, and move contain modified code originally sourced from Walkthrough
+Methods explode, apply_element, check_element, and get_shocked contain entirely original code
+'''
+
 class Enemy(pg.sprite.Sprite):
     def __init__(self, type, data, waypoints, images):
         # Sprite Init
@@ -23,7 +29,7 @@ class Enemy(pg.sprite.Sprite):
         self.last_shock = pg.time.get_ticks()
 
         # Regarding Image
-        self.original_image = images
+        self.original_image = images.get(type)
         self.angle = 0
         self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()

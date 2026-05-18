@@ -1,5 +1,9 @@
 import pygame as pg
 
+'''
+The Class Button is entirely unoriginal code taken from the Walkthrough
+'''
+
 class Button():
   def __init__(self, x, y, image):
     self.image = image

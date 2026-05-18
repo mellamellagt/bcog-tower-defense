@@ -1,10 +1,5 @@
-# Future Implementations
-- Art for some buttons, turrets, and enemies
-- Endless Mode
-- Fast Forward?
-
 # Tower Defense Game
-This repository contains an interactive tower defense game built with pygame. 
+This repository contains an interactive tower defense game built with pygame. The Tower Defense game features three different types of towers and three different Elements that can be applied to your towers. The Elemental Towers can trigger various Elemental Reactions. There are 5 pre-defined waves but an Endless Mode does exist. The game is not currently designed with any regard to game balance, and it has rather been made rather easy due to the large amount of starting cash. Players are free to do balancing for themselves by changing values in the constants.py file (found under the config folder)
 
 # Installation
     # Install uv
@@ -46,7 +41,8 @@ Everything in the program is controlled by the mouse, click on buttons to activa
 Click on the 'X' button on the pygame window to close the Tower Defense game. 
 
 # Attribution
-Map Assets: Kenney (www.kenney.nl/assets/tower-defense-top-down)
-Pixel Art: Myself (Created using www.pixilart.com)
-    Inspiration Taken from Magnific (www.magnific.com)
+Map: Created using the PC Program 'Tiled'
+    Map Assets: Kenney (www.kenney.nl/assets/tower-defense-top-down)
+Pixel Art: Created using Website 'www.pixilart.com'
+    Various Inspiration Taken from Magnific (www.magnific.com)
 Tower Defense Walkthrough: Coding with Russ (www.youtube.com/watch?v=WRuf9iPAXfM)
