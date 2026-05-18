@@ -1,5 +1,7 @@
 # Tower Defense Game
-This repository contains an interactive tower defense game built with pygame. The Tower Defense game features three different types of towers and three different Elements that can be applied to your towers. The Elemental Towers can trigger various Elemental Reactions. There are 5 pre-defined waves but an Endless Mode does exist. The game is not currently designed with any regard to game balance, and it has rather been made rather easy due to the large amount of starting cash. Players are free to do balancing for themselves by changing values in the constants.py file (found under the config folder)
+This repository contains an interactive tower defense game built with pygame. The Tower Defense game features three different types of towers and three different Elements that can be applied to your towers. The Elemental Towers can trigger various Elemental Reactions. 
+
+There are 5 pre-defined waves but an Endless Mode does exist. The game is not currently designed with any regard to game balance, and it has rather been made rather easy due to the large amount of starting cash. Players are free to do balancing for themselves by changing values in the constants.py file (found under the config folder)
 
 # Installation
     # Install uv
