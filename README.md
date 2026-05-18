@@ -44,7 +44,7 @@ Click on the 'X' button on the pygame window to close the Tower Defense game.
 
 # Attribution
 Map: Created using the PC Program 'Tiled'
-    Map Assets: Kenney (www.kenney.nl/assets/tower-defense-top-down)
+- Map Assets: Kenney (www.kenney.nl/assets/tower-defense-top-down)
 Pixel Art: Created using Website 'www.pixilart.com'
-    Various Inspiration Taken from Magnific (www.magnific.com)
+- Various Inspiration Taken from Magnific (www.magnific.com)
 Tower Defense Walkthrough: Coding with Russ (www.youtube.com/watch?v=WRuf9iPAXfM)
